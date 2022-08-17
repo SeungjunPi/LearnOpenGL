@@ -1,2 +1,7 @@
 ﻿  main.cpp
+C:\Users\jun\OneDrive - knu.ac.kr\ComputerGraphics\LearnOpenGL\OpenGL_tutorial\OpenGL_tutorial\main.cpp(140,27): warning C4305: '초기화 중': 'double'에서 'float'(으)로 잘립니다.
+C:\Users\jun\OneDrive - knu.ac.kr\ComputerGraphics\LearnOpenGL\OpenGL_tutorial\OpenGL_tutorial\main.cpp(164,29): warning C4244: '-=': 'double'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+C:\Users\jun\OneDrive - knu.ac.kr\ComputerGraphics\LearnOpenGL\OpenGL_tutorial\OpenGL_tutorial\main.cpp(168,29): warning C4244: '+=': 'double'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+C:\Users\jun\OneDrive - knu.ac.kr\ComputerGraphics\LearnOpenGL\OpenGL_tutorial\OpenGL_tutorial\main.cpp(172,29): warning C4244: '-=': 'double'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+C:\Users\jun\OneDrive - knu.ac.kr\ComputerGraphics\LearnOpenGL\OpenGL_tutorial\OpenGL_tutorial\main.cpp(173,29): warning C4244: '+=': 'double'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
   OpenGL_tutorial.vcxproj -> C:\Users\jun\OneDrive - knu.ac.kr\ComputerGraphics\LearnOpenGL\OpenGL_tutorial\x64\Debug\OpenGL_tutorial.exe

@@ -12,11 +12,8 @@
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void processInput(GLFWwindow* window);
 
-float texCoords[] = {
-	0.0f, 0.0f,
-	0.5f, 1.0f,
-	1.0f, 0.0f
-};
+bool bKeyUp = false;
+bool bKeyDown = false;
 
 int main()
 {
@@ -88,8 +85,8 @@ int main()
 	glGenTextures(1, &texture1);
 	glBindTexture(GL_TEXTURE_2D, texture1);
 
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
@@ -115,7 +112,7 @@ int main()
 	glGenTextures(1, &texture2);
 	glBindTexture(GL_TEXTURE_2D, texture2);
 
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_MIRRORED_REPEAT);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
@@ -137,6 +134,11 @@ int main()
 	ourShader.use();
 	glUniform1i(glGetUniformLocation(ourShader.ID, "texture1"), 0);
 	ourShader.setInt("texture2", 1);
+
+
+	unsigned int textureRatioLocation = glGetUniformLocation(ourShader.ID, "ratio");
+	float textureRaitio = 0.2;
+	glUniform1f(textureRatioLocation, textureRaitio);
 	
 	while (!glfwWindowShouldClose(window))
 	{
@@ -153,6 +155,28 @@ int main()
 
 		ourShader.use();
 		glBindVertexArray(VAO[0]);
+
+
+		if (bKeyUp ^ bKeyDown)
+		{
+			if (textureRaitio > 1.0f)
+			{
+				textureRaitio -= 0.0001 * bKeyDown;
+			}
+			else if (textureRaitio < 0.0f)
+			{
+				textureRaitio += 0.0001 * bKeyUp;
+			}
+			else
+			{
+				textureRaitio -= 0.0001 * bKeyDown;
+				textureRaitio += 0.0001 * bKeyUp;
+			}
+			
+			
+			glUniform1f(textureRatioLocation, textureRaitio);
+		}
+
 
 		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 		glBindVertexArray(0);
@@ -184,6 +208,24 @@ void processInput(GLFWwindow* window)
 	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
 	{
 		glfwSetWindowShouldClose(window, true);
+	}
+
+	if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS)
+	{
+		bKeyUp = true;
+	}
+	else 
+	{
+		bKeyUp = false;
+	}
+
+	if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS)
+	{
+		bKeyDown = true;
+	}
+	else
+	{
+		bKeyDown = false;
 	}
 }
 
