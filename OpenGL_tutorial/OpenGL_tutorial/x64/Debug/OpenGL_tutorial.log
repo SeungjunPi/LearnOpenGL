@@ -1,5 +1,2 @@
-﻿  Shader.cpp
-  main.cpp
-C:\Users\jun\OneDrive - knu.ac.kr\ComputerGraphics\LearnOpenGL\OpenGL_tutorial\OpenGL_tutorial\main.cpp(138,19): warning C4244: '초기화 중': 'double'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-  코드를 생성하고 있습니다...
+﻿  main.cpp
   OpenGL_tutorial.vcxproj -> C:\Users\jun\OneDrive - knu.ac.kr\ComputerGraphics\LearnOpenGL\OpenGL_tutorial\x64\Debug\OpenGL_tutorial.exe
