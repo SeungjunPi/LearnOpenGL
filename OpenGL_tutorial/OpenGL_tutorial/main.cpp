@@ -5,13 +5,17 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
-#include "Shader.h"
-#include "stb_image.h"
-
-
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
+
+#include "Shader.h"
+#include "stb_image.h"
+#include "Camera.h"
+
+
+unsigned int ScreenWidth = 800;
+unsigned int ScreenHeight = 600;
 
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
@@ -19,35 +23,25 @@ void mouse_callback(GLFWwindow* window, double xpos, double ypos);
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
 void processInput(GLFWwindow* window);
 
-glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, 3.0f);
-glm::vec3 cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
-glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
-
 float deltaTime = 0.0f;
 float lastFrameTime = 0.0f;
 
-float lastX = 400.f;
-float lastY = 300.f;
-
-float yaw = -89.0f;
-float pitch = 0.0f;
-
-float fov = 45.0f;
+float lastMousePositionX = 400.f;
+float lastMousePositionY = 300.f;
 
 bool firstMouse = true;
 
+Camera camera;
+
 int main()
 {
-
-	unsigned int screenWidth = 800;
-	unsigned int screenHeight= 600;
 
 	glfwInit();
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-	GLFWwindow* window = glfwCreateWindow(screenWidth, screenHeight, "Learn OpenGL", NULL, NULL);
+	GLFWwindow* window = glfwCreateWindow(ScreenWidth, ScreenHeight, "Learn OpenGL", NULL, NULL);
 	if (window == NULL)
 	{
 		std::cout << "Fail to create GLFW Window" << std::endl;
@@ -260,10 +254,10 @@ int main()
 		ourShader.use();
 		glBindVertexArray(VAO[0]);
 
-		view = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
+		view = camera.getViewMatrix();
 		ourShader.setMat4("view", view);
 		
-		projection = glm::perspective(glm::radians(fov), (float)screenWidth / (float)screenHeight, 0.1f, 100.0f);
+		projection = camera.getProjectionMatrix();
 		ourShader.setMat4("projection", projection);
 
 		
@@ -316,25 +310,25 @@ void processInput(GLFWwindow* window)
 	float cameraSpeed = 2.5f * deltaTime;
 	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
 	{
-		cameraPos += cameraSpeed * cameraFront;
+		camera.moveForwardCameraPosition(deltaTime);
 	}
 
 	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
 	{
-		cameraPos -= cameraSpeed * cameraFront;
+		camera.moveBackwardCameraPosition(deltaTime);
 	}
 	
 	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
 	{
-		cameraPos -= glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
+		camera.moveLeftCameraPosition(deltaTime);
 	}
 
 	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
 	{
-		cameraPos += glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
+		camera.moveRightCameraPosition(deltaTime);
 	}
 
-	cameraPos.y = 0.0f;
+	camera.stayGround();
 }
 
 
@@ -342,52 +336,29 @@ void mouse_callback(GLFWwindow* window, double xpos, double ypos)
 {
 	if (firstMouse) // this bool variable is initially set to true
 	{
-		lastX = xpos;
-		lastY = ypos;
+		lastMousePositionX = xpos;
+		lastMousePositionY = ypos;
 		firstMouse = false;
 	}
 
-	float xoffeset = xpos - lastX;
-	float yoffeset = lastY - ypos;
+	float xoffset = xpos - lastMousePositionX;
+	float yoffset = lastMousePositionY - ypos;
 
-	lastX = xpos;
-	lastY = ypos;
+	lastMousePositionX = xpos;
+	lastMousePositionY = ypos;
 
 	float sensitivity = 0.05f;
 
-	xoffeset *= sensitivity;
-	yoffeset *= sensitivity;
+	xoffset *= sensitivity;
+	yoffset *= sensitivity;
 
 
-	yaw += xoffeset;	
-	pitch += yoffeset;
-	if (pitch > 89.0f)
-	{
-		pitch = 89.0f;
-	}
-
-	if (pitch < -89.0f)
-	{
-		pitch = -89.0f;
-	}
-
-	glm::vec3 front;
-	front.x = cos(glm::radians(pitch)) * cos(glm::radians(yaw));
-	front.y = sin(glm::radians(pitch));
-	front.z = cos(glm::radians(pitch)) * sin(glm::radians(yaw));
-	cameraFront = glm::normalize(front);
-
-	
+	camera.renewCameraFront(xoffset, yoffset);
 }
 
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
 {
-	if (fov >= 1.0f && fov <= 45.0f)
-		fov -= yoffset;
-	if (fov <= 1.0f)
-		fov = 1.0f;
-	if (fov >= 45.0f)
-		fov = 45.0f;
+	camera.increaseFov(xoffset, yoffset);
 }
 
 
