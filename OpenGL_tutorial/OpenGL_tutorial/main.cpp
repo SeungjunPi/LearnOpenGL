@@ -35,28 +35,33 @@ Camera camera;
 
 int main()
 {
-
-	glfwInit();
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-
-	GLFWwindow* window = glfwCreateWindow(ScreenWidth, ScreenHeight, "Learn OpenGL", NULL, NULL);
-	if (window == NULL)
+	GLFWwindow* window;
 	{
-		std::cout << "Fail to create GLFW Window" << std::endl;
-		glfwTerminate();
-		return -1;
+		// set windw
+		glfwInit();
+		glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+		glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+		glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+
+		window = glfwCreateWindow(ScreenWidth, ScreenHeight, "Learn OpenGL", NULL, NULL);
+		if (window == NULL)
+		{
+			std::cout << "Fail to create GLFW Window" << std::endl;
+			glfwTerminate();
+			return -1;
+		}
 	}
 
 	glfwMakeContextCurrent(window);
 	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
-
-	glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
-	glfwSetCursorPosCallback(window, mouse_callback);
-	glfwSetScrollCallback(window, scroll_callback);
-
+	{
+		// set callback functions
+		glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
+		glfwSetCursorPosCallback(window, mouse_callback);
+		glfwSetScrollCallback(window, scroll_callback);
+	}
+	
 	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
 	{
 		std::cout << "Fail to initialize GLAD" << std::endl;
@@ -112,17 +117,13 @@ int main()
 	unsigned int VBO[1];
 	unsigned int VAO[1];
 
-
 	glGenVertexArrays(1, VAO);
 	glGenBuffers(1, VBO);
-
 
 	glBindVertexArray(VAO[0]);
 	glBindBuffer(GL_ARRAY_BUFFER, VBO[0]);
 
-
 	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-
 
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
 	glEnableVertexAttribArray(0);
@@ -186,24 +187,14 @@ int main()
 	stbi_image_free(data2);
 
 	ourShader.use();
-	glUniform1i(glGetUniformLocation(ourShader.ID, "texture1"), 0);
+	ourShader.setInt("texture1", 0);
 	ourShader.setInt("texture2", 1);
 
 	glm::mat4 model = glm::mat4(1.0f);
-	model = glm::rotate(model, glm::radians(-55.0f), glm::vec3(1.0f, 0.0f, 0.0f));
-
 	glm::mat4 view = glm::mat4(1.0f);
-	//view = glm::translate(view, glm::vec3(0.0f, 0.0f, -3.0f));
-	view = glm::lookAt(glm::vec3(0.0f, 0.0f, 3.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-
 	glm::mat4 projection = glm::mat4(1.0f);
-	/*projection = glm::perspective(glm::radians(45.0f), (float)screenWidth / (float)screenHeight, 0.1f, 100.0f);*/
-
-	ourShader.setMat4("model", model);
-	ourShader.setMat4("view", view);
-	ourShader.setMat4("projection", projection);
 	
-	glEnable(GL_DEPTH_TEST);
+	glEnable(GL_DEPTH_TEST); 
 
 	glm::vec3 cubePositions[] = {
 		glm::vec3(0.0f,  0.0f,  0.0f),
@@ -231,25 +222,10 @@ int main()
 		deltaTime = currentFrameTime - lastFrameTime;
 		lastFrameTime = currentFrameTime;
 
-
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, texture1);
 		glActiveTexture(GL_TEXTURE1);
 		glBindTexture(GL_TEXTURE_2D, texture2);
-
-		glm::mat4 trans = glm::mat4(1.0f);
-
-		//trans = glm::translate(trans, glm::vec3(0.5f, -0.5f, 0.0f));
-		
-		
-		trans = glm::rotate(trans, lastFrameTime, glm::vec3(0.0f, 0.0f, 1.0f));
-		trans = glm::translate(trans, glm::vec3(0.5f, -0.5f, 0.0f));
-
-		float frequency = 8.0f;
-		float scaleAmount = 0.5f * sin(frequency * lastFrameTime) + 1.0f;
-		
-
-		trans = glm::scale(trans, glm::vec3(scaleAmount));
 
 		ourShader.use();
 		glBindVertexArray(VAO[0]);
